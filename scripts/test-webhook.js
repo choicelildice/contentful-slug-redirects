@@ -129,7 +129,7 @@ async function testSlugChangeDetection() {
   // The handler will call getPreviousSlug, which reads MOCK_PREVIOUS_SLUG from env.
   // The dev server must have MOCK_PREVIOUS_SLUG=old-blog-post set in .env.local.
   const mockPreviousSlug = process.env.MOCK_PREVIOUS_SLUG ?? "old-blog-post";
-  const newSlug = "new-blog-post";
+  const newSlug = process.env.MOCK_NEW_SLUG ?? "new-blog-post";
 
   const payload = {
     sys: {
