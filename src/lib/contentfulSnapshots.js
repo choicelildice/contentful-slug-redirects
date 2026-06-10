@@ -18,6 +18,12 @@ const CMA_BASE = "https://api.contentful.com";
  * @param {string} locale - e.g. "en-US"
  */
 export async function getPreviousSlug(entryId, slugFieldId = "slug", locale = "en-US") {
+  // Local testing: set MOCK_PREVIOUS_SLUG to simulate a prior published slug
+  // without needing real CMA credentials. Remove this in production.
+  if (process.env.MOCK_PREVIOUS_SLUG) {
+    return process.env.MOCK_PREVIOUS_SLUG;
+  }
+
   const spaceId = process.env.CONTENTFUL_SPACE_ID;
   const environmentId = process.env.CONTENTFUL_ENVIRONMENT_ID ?? "master";
   const cmaToken = process.env.CONTENTFUL_CMA_TOKEN;

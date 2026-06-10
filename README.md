@@ -112,6 +112,58 @@ npm run dev
 
 ---
 
+## Testing locally
+
+A test script sends example payloads to the running dev server and reports pass/fail for all four scenarios. No real Contentful credentials are needed — Case 3 (slug-change detection) uses `MOCK_PREVIOUS_SLUG` to simulate a prior published slug.
+
+**1. Add `MOCK_PREVIOUS_SLUG` to your `.env.local`:**
+
+```
+MOCK_PREVIOUS_SLUG=old-blog-post
+```
+
+**2. Start the dev server in one terminal:**
+
+```bash
+npm run dev
+```
+
+**3. Run the test script in another terminal:**
+
+```bash
+npm run test:webhook
+```
+
+Expected output:
+
+```
+Scenario 1: Redirect entry publish
+  ✓ webhook returns 200
+  ✓ action is 'added'
+  ✓ redirect rule written to store
+  ✓ isPermanent is true
+
+Scenario 2: Redirect entry unpublish
+  ✓ webhook returns 200
+  ✓ action is 'removed'
+  ✓ redirect rule removed from store
+
+Scenario 3: Auto slug-change detection (mock CMA — no credentials needed)
+  ✓ webhook returns 200
+  ✓ action is 'auto-redirect'
+  ✓ redirect from /old-blog-post written
+  ✓ isPermanent is true
+
+Scenario 4: Bad webhook secret is rejected
+  ✓ returns 401
+
+13 checks: 13 passed, 0 failed
+```
+
+To test with real CMA credentials, remove `MOCK_PREVIOUS_SLUG` from `.env.local` and set `CONTENTFUL_SPACE_ID` and `CONTENTFUL_CMA_TOKEN` instead.
+
+---
+
 ## Production considerations
 
 | Concern | Recommendation |
