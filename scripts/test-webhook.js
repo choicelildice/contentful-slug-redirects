@@ -6,6 +6,8 @@
 //   1. Start the dev server:  npm run dev
 //   2. In another terminal:   node scripts/test-webhook.js
 //
+// Reads .env.local automatically so CONTENTFUL_WEBHOOK_SECRET matches the dev server.
+//
 // All three scenarios run without real Contentful credentials.
 // Case 3 uses MOCK_PREVIOUS_SLUG to simulate a prior published slug —
 // with real credentials, remove that env var and the handler will call the CMA.
@@ -13,6 +15,25 @@
 // Contentful provides this sample code solely to demonstrate a technical scenario.
 // Any and all sample code provided by Contentful is not intended for production use.
 // Contentful is not responsible for maintaining or supporting this sample code.
+
+// Load .env.local so CONTENTFUL_WEBHOOK_SECRET matches the running dev server
+const fs = require("fs");
+const path = require("path");
+
+try {
+  const envFile = fs.readFileSync(path.resolve(process.cwd(), ".env.local"), "utf8");
+  for (const line of envFile.split("\n")) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith("#")) continue;
+    const eq = trimmed.indexOf("=");
+    if (eq === -1) continue;
+    const key = trimmed.slice(0, eq).trim();
+    const val = trimmed.slice(eq + 1).trim();
+    if (!(key in process.env)) process.env[key] = val;
+  }
+} catch {
+  // .env.local not found — rely on environment variables already set
+}
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000";
 const WEBHOOK_SECRET = process.env.CONTENTFUL_WEBHOOK_SECRET ?? "test-secret";
