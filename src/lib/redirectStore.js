@@ -32,7 +32,7 @@ export async function addRedirect({ from, to, isPermanent = true }) {
   // Collapse chains: if anything currently points to `from`, update it to point to `to`
   for (const [existingFrom, rule] of Object.entries(redirects)) {
     if (rule.to === from) {
-      redirects[existingFrom] = { to, isPermanent: rule.isPermanent };
+      redirects[existingFrom] = { to, isPermanent };
     }
   }
 
