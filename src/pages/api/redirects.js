@@ -13,5 +13,5 @@ export default async function handler(req, res) {
   if (!path) return res.status(400).json({ error: "Missing path param" });
 
   const rule = await getRedirect(path);
-  return res.status(200).json(rule ?? { destination: null });
+  return res.status(200).json(rule ?? null);
 }

@@ -13,20 +13,23 @@ import { NextResponse } from "next/server";
 export async function middleware(req) {
   const { pathname } = req.nextUrl;
 
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_BASE_URL}/api/redirects?path=${encodeURIComponent(pathname)}`
-  );
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/redirects?path=${encodeURIComponent(pathname)}`
+    );
 
-  if (res.ok) {
-    const rule = await res.json();
-    if (rule?.to) {
-      const destination = new URL(
-        rule.to.startsWith("http") ? rule.to : rule.to,
-        req.url
-      );
-      const statusCode = rule.isPermanent ? 308 : 307;
-      return NextResponse.redirect(destination, statusCode);
+    if (res.ok) {
+      const rule = await res.json();
+      if (rule?.to) {
+        const destination = rule.to.startsWith("http")
+          ? new URL(rule.to)
+          : new URL(rule.to, req.url);
+        const statusCode = rule.isPermanent ? 308 : 307;
+        return NextResponse.redirect(destination, statusCode);
+      }
     }
+  } catch {
+    // fetch failed — fall through and serve the request normally
   }
 
   return NextResponse.next();

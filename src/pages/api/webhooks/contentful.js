@@ -12,6 +12,7 @@
 // Any and all sample code provided by Contentful is not intended for production use.
 // Contentful is not responsible for maintaining or supporting this sample code.
 
+import { timingSafeEqual } from "crypto";
 import { addRedirect, removeRedirect } from "@/lib/redirectStore";
 import { getPreviousSlug } from "@/lib/contentfulSnapshots";
 
@@ -30,8 +31,12 @@ const SLUG_PATH_PREFIX = process.env.CONTENTFUL_SLUG_PATH_PREFIX ?? "";
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).end();
 
-  const incomingSecret = req.headers["x-contentful-webhook-secret"];
-  if (incomingSecret !== process.env.CONTENTFUL_WEBHOOK_SECRET) {
+  const incomingSecret = req.headers["x-contentful-webhook-secret"] ?? "";
+  const expectedSecret = process.env.CONTENTFUL_WEBHOOK_SECRET ?? "";
+  const secretsMatch =
+    incomingSecret.length === expectedSecret.length &&
+    timingSafeEqual(Buffer.from(incomingSecret), Buffer.from(expectedSecret));
+  if (!secretsMatch) {
     return res.status(401).json({ error: "Unauthorized" });
   }
 
